@@ -1,6 +1,7 @@
 import supertest from "supertest";
 import app from "../src/application/web";
 import { logger } from "../src/application/logging";
+import { UserTest } from "./test-utils";
 
 describe("POST /api/user", () => {
   it("should register a new user", async () => {
@@ -35,5 +36,45 @@ describe("POST /api/user", () => {
 
     expect(response.status).toBe(400);
     expect(response.body.errors).toBeDefined();
+  });
+
+  it("should regis role Admin", async () => {
+    const response = await supertest(app).post("/api/user").send({
+      name: "admin",
+      email: "admin@gmail.com",
+      password: "admin12345",
+      role: "ADMIN",
+    });
+
+    // logger.debug(response.body);
+    expect(response.status).toBe(200);
+    expect(response.body.data.name).toBe("admin");
+    expect(response.body.data.email).toBe("admin@gmail.com");
+  });
+});
+
+describe("POST /api/user/login", () => {
+  beforeEach(async () => {
+    await UserTest.create();
+  });
+
+  afterEach(async () => {
+    await UserTest.delete();
+  });
+
+  it("should login a user", async () => {
+    const response = await supertest(app).post("/api/user/login").send({
+      email: "test@test.com",
+      password: "test1234",
+    });
+
+    logger.debug(response.body);
+
+    expect(response.status).toBe(200);
+    expect(response.body.data.name).toBe("test");
+    expect(response.body.data.email).toBe("test@test.com");
+    expect(response.body.data.role).toBe("USER");
+    expect(response.body.data.token).toBeDefined();
+    console.log(`Token: ${response.body.data.token}`);
   });
 });

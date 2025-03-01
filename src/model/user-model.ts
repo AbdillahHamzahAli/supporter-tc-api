@@ -4,6 +4,7 @@ export type userResponse = {
   name: string;
   email: string;
   role: string;
+  token?: string;
 };
 
 export type CreateUserRequest = {
@@ -11,6 +12,11 @@ export type CreateUserRequest = {
   email: string;
   password: string;
   role?: Role;
+};
+
+export type LoginUserRequest = {
+  email: string;
+  password: string;
 };
 
 enum Role {

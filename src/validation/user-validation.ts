@@ -7,4 +7,9 @@ export class UserValidation {
     password: z.string().min(8),
     role: z.enum(["ADMIN", "USER"]).default("USER"),
   });
+
+  static readonly LOGIN: ZodType = z.object({
+    email: z.string().email(),
+    password: z.string().min(8),
+  });
 }
