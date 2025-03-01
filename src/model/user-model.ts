@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 
 export type userResponse = {
   name: string;
@@ -18,11 +18,6 @@ export type LoginUserRequest = {
   email: string;
   password: string;
 };
-
-enum Role {
-  ADMIN = "ADMIN",
-  USER = "USER",
-}
 
 export function toUserResponse(user: User): userResponse {
   return {

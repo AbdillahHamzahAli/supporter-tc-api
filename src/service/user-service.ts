@@ -63,7 +63,7 @@ export class UserService {
     // generate token
     const token = jwt.sign(
       {
-        email: user.email,
+        id: user.id,
         role: user.role,
       },
       MYENV.JWT_SCRET,
