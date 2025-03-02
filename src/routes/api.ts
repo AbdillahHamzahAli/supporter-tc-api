@@ -1,16 +1,19 @@
 import express from "express";
 import { authMiddleware } from "../middleware/auth-middleware";
 import { PostController } from "../controller/post-controller";
+import { RoleMiddleware } from "../middleware/role-middleware";
 
 export const apiRouter = express.Router();
 
-apiRouter.use(authMiddleware as express.RequestHandler);
-apiRouter.post("/api/post", PostController.create as express.RequestHandler);
+apiRouter.use(authMiddleware);
+apiRouter.post("/api/post", RoleMiddleware(["ADMIN"]), PostController.create);
 apiRouter.put(
   "/api/post/:slug",
-  PostController.update as express.RequestHandler
+  RoleMiddleware(["ADMIN"]),
+  PostController.update
 );
 apiRouter.delete(
   "/api/post/:slug",
-  PostController.delete as express.RequestHandler
+  RoleMiddleware(["ADMIN"]),
+  PostController.delete
 );

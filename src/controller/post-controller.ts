@@ -1,13 +1,13 @@
+import { UserRequest } from "../type/user-request";
 import { NextFunction, Request, Response } from "express";
 import { CreatePostRequest, UpdatePostRequest } from "../model/post-model";
 import { PostService } from "../service/post-service";
-import { UserRequest } from "../type/user-request";
 
 export class PostController {
   static async create(req: UserRequest, res: Response, next: NextFunction) {
     try {
       const request: CreatePostRequest = req.body as CreatePostRequest;
-      request.authorId = req.user.id;
+      request.authorId = req.user!.id;
       const reponse = await PostService.create(request);
       res.status(200).json({
         data: reponse,
@@ -33,7 +33,7 @@ export class PostController {
     try {
       const slug = req.params.slug;
       const request: UpdatePostRequest = req.body as UpdatePostRequest;
-      const reponse = await PostService.update(slug, request, req.user.id);
+      const reponse = await PostService.update(slug, request, req.user!.id);
       res.status(200).json({
         data: reponse,
       });
@@ -45,7 +45,7 @@ export class PostController {
   static async delete(req: UserRequest, res: Response, next: NextFunction) {
     try {
       const slug = req.params.slug;
-      await PostService.delete(slug, req.user.id);
+      await PostService.delete(slug, req.user!.id);
       res.status(200).json({
         data: "OK",
       });
