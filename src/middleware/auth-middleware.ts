@@ -1,12 +1,9 @@
 import jwt, { Secret } from "jsonwebtoken";
 import { MYENV } from "../config/environment";
 import { NextFunction, Request, Response } from "express";
+import { UserRequest } from "../type/user-request";
 
 export const SECRET_KEY: Secret = MYENV.JWT_SCRET;
-
-export interface CustomRequest extends Request {
-  authorId: number;
-}
 
 interface JwtPayload {
   role: string;
@@ -14,7 +11,7 @@ interface JwtPayload {
 }
 
 export const authMiddleware = (
-  req: Request,
+  req: UserRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -26,11 +23,7 @@ export const authMiddleware = (
     }
 
     const decoded = jwt.verify(token, SECRET_KEY) as JwtPayload;
-    if (decoded.role !== "ADMIN") {
-      throw new Error("Unauthorized");
-    }
-    req.body.authorId = decoded.id;
-
+    req.user = decoded;
     next();
   } catch (err) {
     res.status(401).json({ errors: (err as Error).message });

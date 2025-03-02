@@ -21,6 +21,13 @@ export type CreatePostRequest = {
   authorId: number;
 };
 
+export type UpdatePostRequest = {
+  title: string;
+  thumbnail: string;
+  content: string;
+  published: boolean;
+};
+
 export function toPostResponse(post: Post & { author: User }): PostResponse {
   return {
     id: post.id,
