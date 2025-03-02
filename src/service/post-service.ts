@@ -7,7 +7,7 @@ import {
 } from "../model/post-model";
 import { PostValidation } from "../validation/post-validation";
 import { Validation } from "../validation/validation";
-import slug from "slug";
+import slugify from "slugify";
 
 export class PostService {
   static async create(request: CreatePostRequest): Promise<PostResponse> {
@@ -18,7 +18,7 @@ export class PostService {
 
     const totalPostWithSameSlug = await prismaClient.post.count({
       where: {
-        slug: slug(createPostRequest.title),
+        slug: slugify(createPostRequest.title),
       },
     });
 
@@ -31,7 +31,7 @@ export class PostService {
 
     const postWithSlug = {
       ...createPostRequest,
-      slug: slug(createPostRequest.title),
+      slug: slugify(createPostRequest.title),
     };
 
     const post = await prismaClient.post.create({
