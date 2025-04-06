@@ -41,7 +41,6 @@ export function toPostResponse(post: Post & { author: User }): PostResponse {
     author: {
       email: post.author.email,
       name: post.author.name || "",
-      role: post.author.role,
     },
   };
 }

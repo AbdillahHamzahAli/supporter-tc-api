@@ -17,6 +17,17 @@ export class PostController {
     }
   }
 
+  static async getPosts(req: Request, res: Response, next: NextFunction) {
+    try {
+      const reponse = await PostService.getAllPosts();
+      res.status(200).json({
+        data: reponse,
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
+
   static async get(req: Request, res: Response, next: NextFunction) {
     try {
       const slug = req.params.slug;

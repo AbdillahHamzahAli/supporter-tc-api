@@ -6,6 +6,7 @@ import {
   toPostResponse,
   UpdatePostRequest,
 } from "../model/post-model";
+import { PostRepository } from "../repository/post-repository";
 import { PostValidation } from "../validation/post-validation";
 import { Validation } from "../validation/validation";
 import slugify from "slugify";
@@ -24,19 +25,10 @@ export class PostService {
 
     if (totalPostWithSameSlug !== 0) {
       throw new ResponseError(
-        401,
+        409,
         "Slug already exists, please change the title"
       );
     }
-  }
-
-  private static createPostWithSlug<T extends { title: string }>(
-    postData: T
-  ): T & { slug: string } {
-    return {
-      ...postData,
-      slug: slugify(postData.title),
-    };
   }
 
   static async create(request: CreatePostRequest): Promise<PostResponse> {
@@ -45,27 +37,20 @@ export class PostService {
       request
     );
     await this.validateSlugUniqueness(validatedRequest.title);
-
-    const postWithSlug =
-      this.createPostWithSlug<CreatePostRequest>(validatedRequest);
-    const post = await prismaClient.post.create({
-      data: postWithSlug,
-      include: { author: true },
-    });
-
+    const post = await PostRepository.createPost(validatedRequest);
     return toPostResponse(post);
   }
 
-  static async get(slug: string): Promise<PostResponse> {
-    const post = await prismaClient.post.findFirst({
-      where: { slug },
-      include: { author: true },
-    });
+  static async getAllPosts(): Promise<PostResponse[]> {
+    const posts = await PostRepository.getAllPosts();
+    return posts.map(toPostResponse);
+  }
 
+  static async get(slug: string): Promise<PostResponse> {
+    const post = await PostRepository.getPostBySlug(slug);
     if (!post) {
       throw new ResponseError(404, "Post not found");
     }
-
     return toPostResponse(post);
   }
 
@@ -77,25 +62,15 @@ export class PostService {
     const existingPost = await prismaClient.post.findFirst({
       where: { slug, authorId: userId },
     });
-
     if (!existingPost) {
       throw new ResponseError(404, "Post not found");
     }
-
     const validatedRequest = Validation.validate(
       PostValidation.UPDATE,
       request
     );
     await this.validateSlugUniqueness(validatedRequest.title, slug);
-    const postWithSlug =
-      this.createPostWithSlug<UpdatePostRequest>(validatedRequest);
-
-    const updatedPost = await prismaClient.post.update({
-      where: { slug },
-      data: postWithSlug,
-      include: { author: true },
-    });
-
+    const updatedPost = await PostRepository.updatePost(slug, validatedRequest);
     return toPostResponse(updatedPost);
   }
 
@@ -108,9 +83,7 @@ export class PostService {
       throw new ResponseError(404, "Post not found");
     }
 
-    await prismaClient.post.delete({
-      where: { slug },
-    });
+    await PostRepository.deletePost(slug);
 
     return "Post deleted successfully";
   }
