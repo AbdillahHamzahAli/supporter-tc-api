@@ -1,6 +1,9 @@
+import { ResponseError } from "../error/response-error";
 import {
   CreateScheduleRequest,
+  GetSceduleResponse,
   SceduleResponse,
+  UpdateScheduleRequest,
   code,
   toSceduleResponse,
 } from "../model/schedule-model";
@@ -30,6 +33,46 @@ export class ScheduleService {
       scheduleResult.code,
       scheduleResult.location
     );
+  }
+
+  static async update(
+    request: UpdateScheduleRequest
+  ): Promise<SceduleResponse> {
+    const updateRequest = Validation.validate(
+      ScheduleValidation.UPDATE,
+      request
+    );
+
+    const exists = await ScheduleRepository.getScheduleById(updateRequest.id);
+
+    if (!exists) {
+      throw new ResponseError(404, "Schedule not found");
+    }
+
+    const location = await this.getOrCreateLocation(updateRequest.location);
+    updateRequest.location = location.id;
+
+    const scheduleResult = await ScheduleRepository.update(updateRequest);
+
+    return toSceduleResponse(
+      scheduleResult.schedule,
+      scheduleResult.code,
+      scheduleResult.location
+    );
+  }
+
+  static async getAll(): Promise<GetSceduleResponse[]> {
+    const schedules = await ScheduleRepository.getAll();
+    const schedulesResponse = schedules.map((schedule) => {
+      return {
+        id: schedule.id,
+        title: schedule.title,
+        start: schedule.start,
+        end: schedule.end,
+        location: schedule.location,
+      };
+    });
+    return schedulesResponse;
   }
 
   private static async getOrCreateLocation(locationInput: string) {

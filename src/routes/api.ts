@@ -12,3 +12,9 @@ apiRouter.post(
   RoleMiddleware(["ADMIN"]),
   ScheduleController.create
 );
+
+apiRouter.put(
+  "/api/schedule/:id",
+  RoleMiddleware(["ADMIN"]),
+  ScheduleController.update
+);

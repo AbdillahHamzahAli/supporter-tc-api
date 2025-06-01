@@ -32,3 +32,43 @@ export class UserTest {
     return response.body.data.token;
   }
 }
+
+export class ScheduleTest {
+  static async create() {
+    const loc = await LocationTest.create();
+    return await prismaClient.schedule.create({
+      data: {
+        title: "test",
+        start: new Date(),
+        end: new Date(),
+        locationId: loc.id,
+      },
+    });
+  }
+
+  static async delete() {
+    await prismaClient.schedule.deleteMany({
+      where: {
+        title: "test",
+      },
+    });
+  }
+}
+
+export class LocationTest {
+  static async create() {
+    return await prismaClient.location.create({
+      data: {
+        locationName: "test",
+      },
+    });
+  }
+
+  static async delete() {
+    await prismaClient.location.deleteMany({
+      where: {
+        locationName: "test",
+      },
+    });
+  }
+}

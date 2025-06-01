@@ -8,4 +8,12 @@ export class ScheduleValidation {
     location: z.string().min(3),
     generateCode: z.boolean().default(false),
   });
+
+  static readonly UPDATE: ZodType = z.object({
+    id: z.string().min(3),
+    title: z.string().min(3),
+    start: z.string().datetime().min(3),
+    end: z.string().datetime().min(3),
+    location: z.string().min(3),
+  });
 }
