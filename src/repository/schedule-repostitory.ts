@@ -8,7 +8,7 @@ import {
   UpdateScheduleRequest,
 } from "../model/schedule-model";
 
-type SceduleReturn = {
+type ScheduleReturn = {
   schedule: Schedule;
   code: ScheduleCode | null;
   location: Location;
@@ -18,7 +18,7 @@ export class ScheduleRepository {
   static async create(
     data: CreateScheduleRequest,
     code?: code
-  ): Promise<SceduleReturn> {
+  ): Promise<ScheduleReturn> {
     return prismaClient.$transaction(async (tx) => {
       let codeId: string | undefined;
       if (code) {
@@ -56,7 +56,7 @@ export class ScheduleRepository {
     });
   }
 
-  static async update(data: UpdateScheduleRequest): Promise<SceduleReturn> {
+  static async update(data: UpdateScheduleRequest): Promise<ScheduleReturn> {
     const result = await prismaClient.schedule.update({
       where: {
         id: data.id,
@@ -103,6 +103,32 @@ export class ScheduleRepository {
         code: req.code,
         qrcode: req.qrcode,
       },
+    });
+  }
+
+  static async updateScheduleCode(
+    codeId: string,
+    sceduleId: string
+  ): Promise<ScheduleReturn> {
+    return prismaClient.$transaction(async (tx) => {
+      const schedule = await tx.schedule.update({
+        where: {
+          id: sceduleId,
+        },
+        data: {
+          codeId,
+        },
+        include: {
+          code: true,
+          location: true,
+        },
+      });
+
+      return {
+        schedule,
+        code: schedule.code,
+        location: schedule.location,
+      };
     });
   }
 }

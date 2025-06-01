@@ -43,4 +43,20 @@ export class ScheduleController {
       next(e);
     }
   }
+
+  // ===== Schedule Code =====
+  static async createScheduleCode(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const response = await ScheduleService.createScheduleCode(req.params.id);
+      res.status(201).json({
+        data: response,
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
 }

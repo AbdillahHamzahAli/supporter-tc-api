@@ -58,3 +58,22 @@ describe("GET /api/schedule", () => {
     console.log("response : ", response.body);
   });
 });
+
+describe("PUT /api/schedule/code/:id", () => {
+  afterEach(async () => {
+    await ScheduleTest.delete();
+    await LocationTest.delete();
+  });
+  it("should add schedule code", async () => {
+    const schedule = await ScheduleTest.create();
+    const token = await UserTest.getToken();
+    const response = await supertest(app)
+      .put(`/api/schedule/code/${schedule.id}`)
+      .set("Authorization", `Bearer ${token}`);
+
+    logger.debug(response.body);
+    expect(response.status).toBe(201);
+
+    console.log("response : ", response.body);
+  });
+});

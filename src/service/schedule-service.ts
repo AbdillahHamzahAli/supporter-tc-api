@@ -75,6 +75,30 @@ export class ScheduleService {
     return schedulesResponse;
   }
 
+  // ===== Schedule Code =====
+  static async createScheduleCode(
+    scheduleId: string
+  ): Promise<SceduleResponse> {
+    const exists = await ScheduleRepository.getScheduleById(scheduleId);
+
+    if (!exists) {
+      throw new ResponseError(404, "Schedule not found");
+    }
+
+    const code = await generateCode(6);
+    const scheduleCode = await ScheduleRepository.createCode(code);
+    const schedule = await ScheduleRepository.updateScheduleCode(
+      scheduleCode.id,
+      scheduleId
+    );
+
+    return toSceduleResponse(
+      schedule.schedule,
+      schedule.code,
+      schedule.location
+    );
+  }
+
   private static async getOrCreateLocation(locationInput: string) {
     const existing = await LocationRepository.getLocation(locationInput);
     return existing ?? (await LocationRepository.create(locationInput));

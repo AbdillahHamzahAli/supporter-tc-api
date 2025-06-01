@@ -18,3 +18,9 @@ apiRouter.put(
   RoleMiddleware(["ADMIN"]),
   ScheduleController.update
 );
+
+apiRouter.put(
+  "/api/schedule/code/:id",
+  RoleMiddleware(["ADMIN"]),
+  ScheduleController.createScheduleCode
+);
