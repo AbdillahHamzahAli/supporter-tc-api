@@ -48,10 +48,15 @@ export class ScheduleRepository {
     });
   }
 
-  static async getScheduleById(id: string): Promise<Schedule | null> {
+  static async getScheduleById(
+    id: string
+  ): Promise<(Schedule & { code: ScheduleCode | null }) | null> {
     return prismaClient.schedule.findUnique({
       where: {
         id,
+      },
+      include: {
+        code: true,
       },
     });
   }
