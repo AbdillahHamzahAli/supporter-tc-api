@@ -10,17 +10,17 @@ describe("POST /api/schedule", () => {
       .post("/api/schedule")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        title: "Test Schedule 2",
-        start: "2023-05-01T00:00:00.000Z",
-        end: "2023-05-02T00:00:00.000Z",
+        title: "Test Schedule Final 3",
+        start: "2025-07-25T00:00:00.000Z",
+        end: "2025-08-26T17:00:00.000Z",
         location: "Test Location",
-        generateCode: false,
+        generateCode: true,
       });
 
     logger.debug(response.body);
     expect(response.status).toBe(201);
 
-    console.log("response : ", response.body);
+    // console.log("response : ", response.body);
   });
 });
 

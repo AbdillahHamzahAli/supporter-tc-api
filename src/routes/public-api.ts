@@ -1,6 +1,7 @@
 import express from "express";
 import { UserController } from "../controller/user-controller";
 import { ScheduleController } from "../controller/schedule-controller";
+import QRCode from "qrcode";
 
 export const publicRouter = express.Router();
 

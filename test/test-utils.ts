@@ -25,8 +25,8 @@ export class UserTest {
 
   static async getToken() {
     const response = await supertest(app).post("/api/user/login").send({
-      email: "test@test.com",
-      password: "test1234",
+      email: "admin@gmail.com",
+      password: "admin12345",
     });
 
     return response.body.data.token;

@@ -1,3 +1,4 @@
+import { generateQR } from "../utils/generate-qr";
 import { ResponseError } from "../error/response-error";
 import {
   CreateScheduleRequest,
@@ -12,6 +13,7 @@ import { ScheduleRepository } from "../repository/schedule-repostitory";
 import { generateCode } from "../utils/generate-code";
 import { ScheduleValidation } from "../validation/scedule-validation";
 import { Validation } from "../validation/validation";
+import { uploadImage } from "../utils/s3-storage/upload-image";
 
 export class ScheduleService {
   static async create(
@@ -19,9 +21,16 @@ export class ScheduleService {
   ): Promise<SceduleResponse> {
     const validated = Validation.validate(ScheduleValidation.CREATE, request);
 
-    const code: code | undefined = validated.generateCode
-      ? await generateCode(6)
-      : undefined;
+    let code: code;
+    if (validated.generateCode) {
+      const code6 = await generateCode(6);
+      const qrcode = await generateQR(code6);
+      const location = await uploadImage(qrcode, `qrcode-${code6}.png`);
+      code = {
+        code: code6,
+        qrcode: location,
+      };
+    }
 
     const location = await this.getOrCreateLocation(validated.location);
     validated.location = location.id; // ubah menjadi location id
@@ -85,7 +94,15 @@ export class ScheduleService {
       throw new ResponseError(404, "Schedule not found");
     }
 
-    const code = await generateCode(6);
+    let code: code;
+    const code6 = await generateCode(6);
+    const qrcode = await generateQR(code6);
+    const location = await uploadImage(qrcode, `qrcode-${code6}.png`);
+    code = {
+      code: code6,
+      qrcode: location,
+    };
+
     const scheduleCode = await ScheduleRepository.createCode(code);
     const schedule = await ScheduleRepository.updateScheduleCode(
       scheduleCode.id,
